@@ -2,8 +2,8 @@ import numpy as np
 import random
 
 
-def ObjectiveFunctionValue (n,l):
-    m,v = randoms(n,l)
+def ObjectiveFunctionValue ():
+    n,m,v = randoms()
     sum = 0
     for i in range (n):
         for j in range (i, n):
@@ -11,12 +11,11 @@ def ObjectiveFunctionValue (n,l):
     print("We get the sum:", sum)
     return sum
 
-def randoms (size, limit):
+def randoms ():
     
-    # make a random matrix with values between 0-10 and fill the diagonal with 0s
-    m = np.random.randint(0,limit/2 + 1, (size, size))
-    np.fill_diagonal(m, 0)
-    m = m + m.T
+    # read the matrix provided and its size
+    size = int(np.loadtxt('Adibide1.txt', max_rows = 1))
+    m = np.loadtxt('Adibide1.txt', skiprows=1)
     
     # create a vector of 1s, and generate random positions where to put 0s
     v = np.ones(size, dtype=int)
@@ -25,11 +24,9 @@ def randoms (size, limit):
     
     print("Having the neighbour matrix:\n",m)
     print("and the solution:\n", v)
-    return m,v
+    return size,m,v
 
 
 ###############################################################################
 
-n = int(input("Enter an even size: "))
-l = int(input("Enter a limit value: "))
-ObjectiveFunctionValue(n,l)
+ObjectiveFunctionValue()

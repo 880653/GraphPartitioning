@@ -14,8 +14,8 @@ def ObjectiveFunctionValue ():
 def randoms ():
     
     # read the matrix provided and its size
-    size = int(np.loadtxt('Adibide1.txt', max_rows = 1))
-    m = np.loadtxt('Adibide1.txt', skiprows=1)
+    size = int(np.loadtxt('Examples\Adibide1.txt', max_rows = 1))
+    m = np.loadtxt('Examples\Adibide1.txt', skiprows=1)
     
     # create a vector of 1s, and generate random positions where to put 0s
     v = np.ones(size, dtype=int)

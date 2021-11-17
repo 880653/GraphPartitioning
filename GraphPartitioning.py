@@ -31,14 +31,18 @@ def swap(actual, i, j):
     return aux
 
 def ObjectiveFunctionValueWithActual(i, j, actual, new, actualValue):
-    value = actualValue
+    value = actualValue.copy()
 
     for index in range(np.size(actual)):
         if(actual[index] == actual[i] & i != index):
             value -= m[actual[index], i]
         else:
             value += m[actual[index], i]
-    return value
+    #print("gaizki", value)
+    
+    valuetemp = ObjectiveFunctionValue(n, m, new)
+    #print("ondo", valuetemp, "\n")
+    return valuetemp
 
 # def ObjectiveFunctionValueWithActual(actual, new, actualValue):
 #     #if we have a 1 or a -1, we have changed that node
@@ -64,13 +68,13 @@ def totalNeighbourhood(n, actualSolution, actualValue):
                 if(newValue < actualValue):
                     actualSolution = newSolution
                     actualValue = newValue
-    return actualSolution
+    return actualSolution, actualValue
 
 ###############################################################################
 
 n,m,v = randoms()
 value = ObjectiveFunctionValue(n,m,v)
-solution = totalNeighbourhood(n, v, value)
-print(value)
-sum = ObjectiveFunctionValue(n, m, solution)
-print(sum)
+print("a", value)
+solution, sum2 = totalNeighbourhood(n, v, value)
+print("b", sum2)
+

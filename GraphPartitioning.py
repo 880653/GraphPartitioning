@@ -7,7 +7,7 @@ def ObjectiveFunctionValue(n,m,v):
     for i in range (n):
         for j in range (i, n):
             sum += (v[i]*(1-v[j]) + v[j]*(1-v[i]))*m[i][j]
-    # print("We get the sum:", sum)
+    print("We get the initial sum:", sum, "\n")
     return sum
 
 def randoms():
@@ -21,7 +21,7 @@ def randoms():
     v[positions] = 0
     
     print("Having the neighbour matrix:\n",m)
-    print("and the solution:\n", v)
+    print("and the random solution:\n", v)
     return size,m,v
 
 def swap(actual, i, j):
@@ -33,38 +33,36 @@ def swap(actual, i, j):
 def ObjectiveFunctionValueWithActual(i, j, actual, new, actualValue):
     value = actualValue.copy()
 
-    for index in range(np.size(actual)):
-        if(actual[index] == actual[i] & i != index):
-            value -= m[actual[index], i]
-        else:
-            value += m[actual[index], i]
+    for index in range(n):
+        if((m[i, index]>0) &( index != j)):
+            if((new[index] == new[i])):
+                value -= m[i, index]
+            else:
+                value += m[i, index]
+        if((m[j, index]>0) & (index != i)):
+            if((new[index] == new[j])):
+                value -= m[j, index]
+            else:
+                value += m[j, index]
+        
+    return value
+
+
+# def NewFunctionValue(actualSolution, newSolution, actualValue):
+#     newValue = actualValue.copy()
+#     changes = (actualSolution - newSolution).copy()
+#     print(changes, "changes")
     
-    valuetemp = ObjectiveFunctionValue(n, m, new)
-    return valuetemp
-
-# def ObjectiveFunctionValueWithActuala(actual, new, actualValue):
-#     value = actualValue.copy()
-#     #if we have a 1 or a -1, we have changed that node
-#     changes=actual-new
-#     for permutation in changes:
-#         if(permutation==1 or permutation==-1):
-#             for x in actual:
-#                 if(x==actual[np.where(permutation)[0][0]]):
-#                     print(actual[np.where(permutation)[0][0]], "x")
-
-#                     value-=m[np.where(x)[0][0], np.where(permutation)[0][0]]
-#                 else:
-#                     value+=m[np.where(x)[0][0], np.where(permutation)[0][0]]
-#     return value
-
-
-def NewFunctionValue(actualSolution, newSolution, actualValue):
-    newValue = actualValue.copy()
-    changes = (actualSolution - newSolution).copy()
-    print(changes, "patata")
-    
-    for i in actualSolution:
-        if (changes[i]==1 )
+#     for i in changes:
+#         if ((changes[i]!=1) & (changes[i]!=-1)):
+#             if(actualSolution[i] == 1):
+#                 pass
+#             elif(actualSolution[i] == -1):
+#                 pass
+#             else:
+#                 pass
+#     return newValue
+            
     
     
 
@@ -74,7 +72,7 @@ def totalNeighbourhood(n, actualSolution, actualValue):
         for j in range(i+1, n):
             if (actualSolution[i] != actualSolution[j]):
                 newSolution = swap(actualSolution, i, j)
-                newValue = NewFunctionValue(actualSolution, newSolution, actualValue)
+                newValue = ObjectiveFunctionValueWithActual(i, j, actualSolution, newSolution, actualValue)
                 if(newValue < actualValue):
                     actualSolution = newSolution
                     actualValue = newValue
@@ -84,8 +82,9 @@ def totalNeighbourhood(n, actualSolution, actualValue):
 
 n,m,v = randoms()
 value = ObjectiveFunctionValue(n,m,v)
-print("a", value)
+
+
 solution, sum2 = totalNeighbourhood(n, v, value)
-print("b", sum2)
-print("solution", solution)
+print("But if we look for local optimum we get the solution \n", solution)
+print("and the sum:", sum2)
 

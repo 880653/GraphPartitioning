@@ -38,24 +38,34 @@ def ObjectiveFunctionValueWithActual(i, j, actual, new, actualValue):
             value -= m[actual[index], i]
         else:
             value += m[actual[index], i]
-    #print("gaizki", value)
     
     valuetemp = ObjectiveFunctionValue(n, m, new)
-    #print("ondo", valuetemp, "\n")
     return valuetemp
 
-# def ObjectiveFunctionValueWithActual(actual, new, actualValue):
+# def ObjectiveFunctionValueWithActuala(actual, new, actualValue):
+#     value = actualValue.copy()
 #     #if we have a 1 or a -1, we have changed that node
 #     changes=actual-new
 #     for permutation in changes:
 #         if(permutation==1 or permutation==-1):
 #             for x in actual:
-#                 if(x==actual[permutation.index()]):
-#                     actualValue-=m[x.index(), permutation.index()]
-#                 else:
-#                     actualValue+=m[x.index(), permutation.index()]
-#     return actualValue
+#                 if(x==actual[np.where(permutation)[0][0]]):
+#                     print(actual[np.where(permutation)[0][0]], "x")
 
+#                     value-=m[np.where(x)[0][0], np.where(permutation)[0][0]]
+#                 else:
+#                     value+=m[np.where(x)[0][0], np.where(permutation)[0][0]]
+#     return value
+
+
+def NewFunctionValue(actualSolution, newSolution, actualValue):
+    newValue = actualValue.copy()
+    changes = (actualSolution - newSolution).copy()
+    print(changes, "patata")
+    
+    for i in actualSolution:
+        if (changes[i]==1 )
+    
     
 
 def totalNeighbourhood(n, actualSolution, actualValue):
@@ -64,7 +74,7 @@ def totalNeighbourhood(n, actualSolution, actualValue):
         for j in range(i+1, n):
             if (actualSolution[i] != actualSolution[j]):
                 newSolution = swap(actualSolution, i, j)
-                newValue = ObjectiveFunctionValueWithActual(i, j, actualSolution, newSolution, actualValue)
+                newValue = NewFunctionValue(actualSolution, newSolution, actualValue)
                 if(newValue < actualValue):
                     actualSolution = newSolution
                     actualValue = newValue
@@ -77,4 +87,5 @@ value = ObjectiveFunctionValue(n,m,v)
 print("a", value)
 solution, sum2 = totalNeighbourhood(n, v, value)
 print("b", sum2)
+print("solution", solution)
 

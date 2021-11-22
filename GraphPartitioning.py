@@ -24,7 +24,7 @@ def randomGreedy(m, size):
     v[index[0][0]] = 0
     v[index[0][1]] = 1
     
-    for i in range(n):
+    for i in range(size):
         if(np.sum(v == 1) < (size/2)):
             if(v[i] != -1):
                 PM = probabilityVector(m, size, v)
@@ -88,7 +88,8 @@ def ObjectiveFunctionValue(i, j, new, actualValue, m, n):
 
 def GraphPartitioning():
     m, n = chargeMatrix()
-    actualSolution = randoms(n)
+    #actualSolution = randoms(n)
+    actualSolution = randomGreedy(m, n)
     actualValue = InitialObjectiveFunctionValue(n, actualSolution, m)
     newSolution=[]
     for i in range(0, n):
@@ -107,7 +108,7 @@ def GraphPartitioning():
 
 GraphPartitioning()
 
-m,n = chargeMatrix()
-v = randomGreedy(m,n)
+# m,n = chargeMatrix()
+# v = randomGreedy(m,n)
 
-print(InitialObjectiveFunctionValue(n, v, m), "pruebaaaaaa")
+# print(InitialObjectiveFunctionValue(n, v, m), "pruebaaaaaa")

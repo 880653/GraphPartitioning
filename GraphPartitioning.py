@@ -2,27 +2,70 @@ import numpy as np
 import random
 
 
-def ObjectiveFunctionValue(n,m,v):
-    sum = 0
-    for i in range (n):
-        for j in range (i, n):
-            sum += (v[i]*(1-v[j]) + v[j]*(1-v[i]))*m[i][j]
-    print("We get the sum:", sum)
-    return sum
-
-def randoms():
-    #read the matrix provided and its size
-    size = int(np.loadtxt('Examples/Adibide1.txt', max_rows = 1))
+def chargeMatrix():
     m = np.loadtxt('Examples/Adibide1.txt', skiprows=1)
-    
-    #create a vector of 1s, and generate random positions where to put 0s
+    n = int(np.loadtxt('Examples/Adibide1.txt', max_rows = 1))
+    print("Having the neighbour matrix:\n",m)
+    return m, n
+
+def randoms(size):
+    # create a vector of 1s, and generate random positions where to put 0s
     v = np.ones(size, dtype=int)
     positions = random.sample(range(0, size), int(size/2))
     v[positions] = 0
     
-    print("Having the neighbour matrix:\n",m)
-    print("and the solution:\n", v)
-    return size,m,v
+    print("and the random initial solution:\n", v)
+    return v
+
+def randomGreedy(m, size):
+    v = np.full(size, -1)
+    min = np.min(m[np.nonzero(m)])
+    index = np.where(m == min)
+    v[index[0][0]] = 0
+    v[index[0][1]] = 1
+
+    # randomProb = random.sample(range(0,1), int(size))
+    # print("random", randomProb)
+
+    for i in range(size):
+        if(np.sum(v == 1) < (size/2)):
+            if(v[i] != -1):
+                PM = probabilityVector(m, size, v)
+
+                maxV = np.max(PM)
+                v[np.where(PM == maxV)[1]] = 1
+
+    v[v == -1] = 0
+    print("and the random initial solution:\n", v)
+    return v
+
+def probabilityVector(m, n, v):
+    probV = np.empty([1, n])
+    for i in range(n):
+        if(v[i] == -1):
+            sum1 = 0
+            sum2 = 0.00001
+            for j in range(n):
+                if(v[j] != -1):
+                    if(v[j] == 1):
+                        sum1 += m[i,j]
+                    else:
+                        sum2 += m[i,j]
+            probV[0,i] = sum1/sum2
+        else:
+            probV[0,i] = 0
+    total = np.sum(probV)
+    probV /= total
+    return probV
+            
+
+def InitialObjectiveFunctionValue(n, v, m):
+    sum = 0
+    for i in range (n):
+        for j in range (i, n):
+            sum += (v[i]*(1-v[j]) + v[j]*(1-v[i]))*m[i][j]
+    print("We get the initial sum:", sum, "\n")
+    return sum
 
 def swap(actual, i, j):
     aux = actual.copy()
@@ -30,52 +73,47 @@ def swap(actual, i, j):
     aux[j] = actual[i]
     return aux
 
-
-def ObjectiveFunctionValueWithActual(actual, new, actualValue):
+def ObjectiveFunctionValue(i, j, new, actualValue, m, n):
     value = actualValue.copy()
-    #if we have a 1 or a -1, we have changed that node
-    changes=actual-new
-    for permutation in changes:
-        if(permutation==1 or permutation==-1):
-            for x in actual:
-                
-                if(x==actual[np.where(permutation)[0][0]]):
-                    value-=m[x, np.where(permutation)[0][0]]
-                else:
-                    value+=m[x, np.where(permutation)[0][0]]
-    print(value, "txarra")
-    print(ObjectiveFunctionValue(n, m, new), "ona")
+
+    for index in range(n):
+        if((m[i, index]>0) &( index != j)):
+            if((new[index] == new[i])):
+                value -= m[i, index]
+            else:
+                value += m[i, index]
+        if((m[j, index]>0) & (index != i)):
+            if((new[index] == new[j])):
+                value -= m[j, index]
+            else:
+                value += m[j, index]
     return value
 
 
-#def NewFunctionValue(actualSolution, newSolution, actualValue):
-#    newValue = actualValue.copy()
-#    changes = (actualSolution - newSolution).copy()
-#    print(changes, "patata")
-#    
-#    for i in actualSolution:
-#        if (changes[i]==1 )
-    
-    
 
-def totalNeighbourhood(n, actualSolution, actualValue):
+def GraphPartitioning():
+    m, n = chargeMatrix()
+    #actualSolution = randoms(n)
+    actualSolution = randomGreedy(m, n)
+    actualValue = InitialObjectiveFunctionValue(n, actualSolution, m)
     newSolution=[]
     for i in range(0, n):
         for j in range(i+1, n):
             if (actualSolution[i] != actualSolution[j]):
                 newSolution = swap(actualSolution, i, j)
-                newValue = ObjectiveFunctionValueWithActual(actualSolution, newSolution, actualValue)
+                newValue = ObjectiveFunctionValue(i, j, newSolution, actualValue, m, n)
                 if(newValue < actualValue):
                     actualSolution = newSolution
                     actualValue = newValue
+    print("But if we look for local optimum we get the solution \n", actualSolution)
+    print("and the sum:", actualValue)
     return actualSolution, actualValue
 
+########################          EXECUTION          ########################
 
+GraphPartitioning()
 
-n,m,v = randoms()
-value = ObjectiveFunctionValue(n,m,v)
-print("a", value)
-solution, sum2 = totalNeighbourhood(n, v, value)
-print("b", sum2)
-print("solution", solution)
+# m,n = chargeMatrix()
+# v = randomGreedy(m,n)
 
+# print(InitialObjectiveFunctionValue(n, v, m), "pruebaaaaaa")

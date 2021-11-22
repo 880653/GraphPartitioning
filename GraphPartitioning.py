@@ -36,16 +36,17 @@ def randomGreedy(m, size):
                 v[np.where(PM == maxV)[1]] = 1
 
     v[v == -1] = 0
-    chooseNode(probabilityVector, size)
+    chooseNode(PM)
     print("and the random initial solution:\n", v)
     return v
 
 
-def chooseNode(probabilityVector, n):
+def chooseNode(probabilityVector):
     randomN = random.uniform(0,1)
     acumulativeV = np.cumsum(probabilityVector)
-    index = np.where(acumulativeV > randomN)[0][0]
-    print(index, "aaaaaaaaaa")
+    index = np.where(acumulativeV >= randomN)[0][0]
+    print(index, "index")
+    return index
     # index = min(which(acumulativeV)>randomN)
     
     
@@ -67,7 +68,7 @@ def probabilityVector(m, n, v):
             probV[0,i] = 0
     total = np.sum(probV)
     probV /= total
-    chooseNode(probV, n)
+    chooseNode(probV)
     return probV
             
 

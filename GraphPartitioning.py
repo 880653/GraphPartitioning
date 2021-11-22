@@ -4,8 +4,9 @@ import random
 
 def chargeMatrix():
     m = np.loadtxt('Examples/Adibide1.txt', skiprows=1)
+    n = int(np.loadtxt('Examples/Adibide1.txt', max_rows = 1))
     print("Having the neighbour matrix:\n",m)
-    return m
+    return m, n
 
 def randoms(size):
     # create a vector of 1s, and generate random positions where to put 0s
@@ -16,7 +17,17 @@ def randoms(size):
     print("and the random initial solution:\n", v)
     return v
 
-def ObjectiveFunctionValue(n, v, m):
+def randomGreedy(m, size):
+    v = np.full(size, -1)
+    min = np.min(m[np.nonzero(m)])
+    index = np.where(m == min)
+    v[index[0][0]] = 0
+    v[index[0][1]] = 1
+    print(v)
+
+    
+
+def InitialObjectiveFunctionValue(n, v, m):
     sum = 0
     for i in range (n):
         for j in range (i, n):
@@ -30,7 +41,7 @@ def swap(actual, i, j):
     aux[j] = actual[i]
     return aux
 
-def ObjectiveFunctionValueWithActual(i, j, new, actualValue, m, n):
+def ObjectiveFunctionValue(i, j, new, actualValue, m, n):
     value = actualValue.copy()
 
     for index in range(n):
@@ -44,30 +55,30 @@ def ObjectiveFunctionValueWithActual(i, j, new, actualValue, m, n):
                 value -= m[j, index]
             else:
                 value += m[j, index]
-        
     return value
 
 
 
 def GraphPartitioning():
-    m = chargeMatrix()
-    n = len(m)
+    m, n = chargeMatrix()
     actualSolution = randoms(n)
-    actualValue = ObjectiveFunctionValue(n, actualSolution, m)
+    actualValue = InitialObjectiveFunctionValue(n, actualSolution, m)
     newSolution=[]
     for i in range(0, n):
         for j in range(i+1, n):
             if (actualSolution[i] != actualSolution[j]):
                 newSolution = swap(actualSolution, i, j)
-                newValue = ObjectiveFunctionValueWithActual(i, j, newSolution, actualValue, m, n)
+                newValue = ObjectiveFunctionValue(i, j, newSolution, actualValue, m, n)
                 if(newValue < actualValue):
                     actualSolution = newSolution
                     actualValue = newValue
+    print("But if we look for local optimum we get the solution \n", newSolution)
+    print("and the sum:", actualValue)
     return actualSolution, actualValue
 
 ########################          EXECUTION          ########################
 
-solution, value = GraphPartitioning()
-print("But if we look for local optimum we get the solution \n", solution)
-print("and the sum:", value)
+GraphPartitioning()
 
+m,n = chargeMatrix()
+randomGreedy(m,n)

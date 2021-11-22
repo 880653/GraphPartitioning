@@ -1,5 +1,6 @@
 import numpy as np
 import random
+from itertools import accumulate
 
 
 def chargeMatrix():
@@ -26,10 +27,6 @@ def randomGreedy(m, size):
     v[index[0][0]] = 0
     v[index[0][1]] = 1
 
-    randomProb = np.random.random(size=size)
-    randomProb /= np.sum(randomProb)
-    print("random", randomProb)
-
     for i in range(size):
         if(np.sum(v == 1) < (size/2)):
             if(v[i] != -1):
@@ -39,8 +36,19 @@ def randomGreedy(m, size):
                 v[np.where(PM == maxV)[1]] = 1
 
     v[v == -1] = 0
+    chooseNode(probabilityVector, size)
     print("and the random initial solution:\n", v)
     return v
+
+
+def chooseNode(probabilityVector, n):
+    randomN = random.uniform(0,1)
+    acumulativeV = np.cumsum(probabilityVector)
+    index = np.where(acumulativeV > randomN)[0][0]
+    print(index, "aaaaaaaaaa")
+    # index = min(which(acumulativeV)>randomN)
+    
+    
 
 def probabilityVector(m, n, v):
     probV = np.empty([1, n])
@@ -59,6 +67,7 @@ def probabilityVector(m, n, v):
             probV[0,i] = 0
     total = np.sum(probV)
     probV /= total
+    chooseNode(probV, n)
     return probV
             
 

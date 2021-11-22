@@ -32,6 +32,7 @@ def randomGreedy(m, size):
                 v[np.where(PM == maxV)[1]] = 1
 
     v[v == -1] = 0
+    print("and the random initial solution:\n", v)
     return v
 
 def probabilityVector(m, n, v):

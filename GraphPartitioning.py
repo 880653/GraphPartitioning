@@ -24,27 +24,34 @@ def randomGreedy(m, size):
     v[index[0][0]] = 0
     v[index[0][1]] = 1
     
-    PM = probabilityMatrix(m, size, v)
-    print("Probability matrix\n", PM, "\n")
-    print(v)
+    for i in range(n):
+        if(np.sum(v == 1) < (size/2)):
+            if(v[i] != -1):
+                PM = probabilityVector(m, size, v)
+                maxV = np.max(PM)
+                v[np.where(PM == maxV)[1]] = 1
+
+    v[v == -1] = 0
     return v
 
-def probabilityMatrix(m, n, v):
-    probM = np.empty([n, n])
+def probabilityVector(m, n, v):
+    probV = np.empty([1, n])
     for i in range(n):
         if(v[i] == -1):
+            sum1 = 0
+            sum2 = 0.00001
             for j in range(n):
-                sum1 = 0
-                sum2 = 0.1
                 if(v[j] != -1):
                     if(v[j] == 1):
                         sum1 += m[i,j]
                     else:
                         sum2 += m[i,j]
-                probM[i,j] = sum1/sum2
+            probV[0,i] = sum1/sum2
         else:
-            probM[i,] = 0
-    return probM
+            probV[0,i] = 0
+    total = np.sum(probV)
+    probV /= total
+    return probV
             
 
 def InitialObjectiveFunctionValue(n, v, m):
@@ -101,4 +108,6 @@ def GraphPartitioning():
 GraphPartitioning()
 
 m,n = chargeMatrix()
-randomGreedy(m,n)
+v = randomGreedy(m,n)
+
+print(InitialObjectiveFunctionValue(n, v, m), "pruebaaaaaa")

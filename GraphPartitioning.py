@@ -23,11 +23,15 @@ def randomGreedy(m, size):
     index = np.where(m == min)
     v[index[0][0]] = 0
     v[index[0][1]] = 1
-    
+
+    # randomProb = random.sample(range(0,1), int(size))
+    # print("random", randomProb)
+
     for i in range(size):
         if(np.sum(v == 1) < (size/2)):
             if(v[i] != -1):
                 PM = probabilityVector(m, size, v)
+
                 maxV = np.max(PM)
                 v[np.where(PM == maxV)[1]] = 1
 
@@ -101,7 +105,7 @@ def GraphPartitioning():
                 if(newValue < actualValue):
                     actualSolution = newSolution
                     actualValue = newValue
-    print("But if we look for local optimum we get the solution \n", newSolution)
+    print("But if we look for local optimum we get the solution \n", actualSolution)
     print("and the sum:", actualValue)
     return actualSolution, actualValue
 

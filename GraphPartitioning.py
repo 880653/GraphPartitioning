@@ -24,20 +24,26 @@ def randomGreedy(m, size):
     v[index[0][0]] = 0
     v[index[0][1]] = 1
     
-    probabilityMatrix(m, size, v)
-    
+    PM = probabilityMatrix(m, size, v)
+    print("Probability matrix\n", PM, "\n")
     print(v)
     return v
 
 def probabilityMatrix(m, n, v):
     probM = np.empty([n, n])
     for i in range(n):
-        for j in range(i, n):
-            if((v[i] != -1) & (v[j] != -1)):
-                break
-            if(v[i] == -1):
-                #probM[i][j] = sum(0)/sum(1)
-                print("azaroak")
+        if(v[i] == -1):
+            for j in range(n):
+                sum1 = 0
+                sum2 = 0.1
+                if(v[j] != -1):
+                    if(v[j] == 1):
+                        sum1 += m[i,j]
+                    else:
+                        sum2 += m[i,j]
+                probM[i,j] = sum1/sum2
+        else:
+            probM[i,] = 0
     return probM
             
 

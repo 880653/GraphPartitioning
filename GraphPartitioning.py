@@ -1,6 +1,5 @@
 import numpy as np
 import random
-from itertools import accumulate
 
 
 def chargeMatrix():
@@ -27,13 +26,16 @@ def randomGreedy(m, size):
     v[index[0][0]] = 0
     v[index[0][1]] = 1
 
-    for i in range(size):
-        if(np.sum(v == 1) < (size/2)):
-            if(v[i] != -1):
-                newNodeIndex = probabilityVector(mCopy, size, v)
-                v[newNodeIndex] = 1
+    i = 0
+    while((np.sum(v == 1) < (size/2)) & (i < size)):
+        if(v[i] == -1):
+            newNodeIndex = probabilityVector(mCopy, size, v)
+            v[newNodeIndex] = 1
+        i += 1
+        if(i == size-1):
+            i = 10
     v[v == -1] = 0
-    print("and the random initial solution:\n", v)
+    print("We have the initial random greedy solution:", v)
     return v
 
 
@@ -70,7 +72,7 @@ def InitialObjectiveFunctionValue(n, v, m):
     for i in range (n):
         for j in range (i, n):
             sum += (v[i]*(1-v[j]) + v[j]*(1-v[i]))*m[i][j]
-    print("We get the initial sum:", sum, "\n")
+    print("with the initial value:", sum)
     return sum
 
 def swap(actual, i, j):
@@ -98,15 +100,18 @@ def ObjectiveFunctionValue(i, j, new, actualValue, m, n):
 
 
 def GraphPartitioning():
-    graspIterations=10
-    bestOptimum, bestValue = grasp(graspIterations)
-    print("After", graspIterations, "iterations, the best local optimum was:", bestOptimum, 
-        "with objective function value: ", bestValue)
+    m, n = chargeMatrix()
+    graspIterations = int(n)
+    bestOptimum, bestValue = grasp(graspIterations, m, n)
+    print("\n After", graspIterations, "iterations \n the best local optimum was:", bestOptimum, 
+        "\n with objective function value: ", bestValue)
 
-def grasp(iterations):
+def grasp(iterations, m, n):
+    
     mySolutions=[]
     myValues=[]
     for x in range(iterations):
+        print("\n", x, ". iteration")
         actualSolution = randomGreedy(m, n)
         actualValue = InitialObjectiveFunctionValue(n, actualSolution, m)
         newSolution=[]
@@ -120,17 +125,15 @@ def grasp(iterations):
                         actualValue = newValue
         mySolutions.append(actualSolution)
         myValues.append(actualValue)
-        print("Found local optimum: ", actualSolution)
-        print(" with objective function value:", actualValue)
+        print("We found local optimum:", actualSolution)
+        print("with the objective function value:", actualValue)
     bestValue=np.min(myValues)
     bestOptimum=np.where(myValues==bestValue)[0]
     return bestOptimum, bestValue
+
+
 ########################          EXECUTION          ########################
 
-m, n = chargeMatrix()
+
 GraphPartitioning()
 
-# m,n = chargeMatrix()
-# v = randomGreedy(m,n)
-
-# print(InitialObjectiveFunctionValue(n, v, m), "pruebaaaaaa")

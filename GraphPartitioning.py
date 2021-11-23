@@ -103,7 +103,7 @@ def GraphPartitioning():
     m, n = chargeMatrix()
     graspIterations = int(n)
     bestOptimum, bestValue = grasp(graspIterations, m, n)
-    print("\n After", graspIterations, "iterations \n the best local optimum was:", bestOptimum, 
+    print("\n After", graspIterations, "iterations \n the best local optimum(s) was(were):", bestOptimum, 
         "\n with objective function value: ", bestValue)
 
 def grasp(iterations, m, n):

@@ -30,11 +30,9 @@ def randomGreedy(m, size):
     for i in range(size):
         if(np.sum(v == 1) < (size/2)):
             if(v[i] != -1):
-                PM = probabilityVector(mCopy, size, v)
-                maxV = np.max(PM)
-                v[np.where(PM == maxV)[1]] = 1
+                newNodeIndex = probabilityVector(mCopy, size, v)
+                v[newNodeIndex] = 1
     v[v == -1] = 0
-    chooseNode(PM)
     print("and the random initial solution:\n", v)
     return v
 
@@ -43,9 +41,7 @@ def chooseNode(probabilityVector):
     randomN = random.uniform(0,1)
     acumulativeV = np.cumsum(probabilityVector)
     index = np.where(acumulativeV >= randomN)[0][0]
-    print(index, "index")
     return index
-    # index = min(which(acumulativeV)>randomN)
     
     
 
@@ -104,7 +100,7 @@ def ObjectiveFunctionValue(i, j, new, actualValue, m, n):
 def GraphPartitioning():
     graspIterations=10
     bestOptimum, bestValue = grasp(graspIterations)
-    print("After ", graspIterations, "iterations, the best local optimum was:", bestOptimum, 
+    print("After", graspIterations, "iterations, the best local optimum was:", bestOptimum, 
         "with objective function value: ", bestValue)
 
 def grasp(iterations):
@@ -126,8 +122,8 @@ def grasp(iterations):
         myValues.append(actualValue)
         print("Found local optimum: ", actualSolution)
         print(" with objective function value:", actualValue)
-    bestValue=np.min(myValues)[0]
-    bestOptimum=np.where(myValues=bestValue)[0]
+    bestValue=np.min(myValues)
+    bestOptimum=np.where(myValues==bestValue)[0]
     return bestOptimum, bestValue
 ########################          EXECUTION          ########################
 

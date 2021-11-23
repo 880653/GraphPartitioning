@@ -32,9 +32,7 @@ def randomGreedy(m, size):
             if(v[i] != -1):
                 PM = probabilityVector(mCopy, size, v)
                 maxV = np.max(PM)
-                
                 v[np.where(PM == maxV)[1]] = 1
-
     v[v == -1] = 0
     chooseNode(PM)
     print("and the random initial solution:\n", v)
@@ -68,8 +66,7 @@ def probabilityVector(m, n, v):
             probV[0,i] = 0
     total = np.sum(probV)
     probV /= total
-    chooseNode(probV)
-    return probV
+    return chooseNode(probV)
             
 
 def InitialObjectiveFunctionValue(n, v, m):
@@ -105,25 +102,36 @@ def ObjectiveFunctionValue(i, j, new, actualValue, m, n):
 
 
 def GraphPartitioning():
-    m, n = chargeMatrix()
-    #actualSolution = randoms(n)
-    actualSolution = randomGreedy(m, n)
-    actualValue = InitialObjectiveFunctionValue(n, actualSolution, m)
-    newSolution=[]
-    for i in range(0, n):
-        for j in range(i+1, n):
-            if (actualSolution[i] != actualSolution[j]):
-                newSolution = swap(actualSolution, i, j)
-                newValue = ObjectiveFunctionValue(i, j, newSolution, actualValue, m, n)
-                if(newValue < actualValue):
-                    actualSolution = newSolution
-                    actualValue = newValue
-    print("But if we look for local optimum we get the solution \n", actualSolution)
-    print("and the sum:", actualValue)
-    return actualSolution, actualValue
+    graspIterations=10
+    bestOptimum, bestValue = grasp(graspIterations)
+    print("After ", graspIterations, "iterations, the best local optimum was:", bestOptimum, 
+        "with objective function value: ", bestValue)
 
+def grasp(iterations):
+    mySolutions=[]
+    myValues=[]
+    for x in range(iterations):
+        actualSolution = randomGreedy(m, n)
+        actualValue = InitialObjectiveFunctionValue(n, actualSolution, m)
+        newSolution=[]
+        for i in range(0, n):
+            for j in range(i+1, n):
+                if (actualSolution[i] != actualSolution[j]):
+                    newSolution = swap(actualSolution, i, j)
+                    newValue = ObjectiveFunctionValue(i, j, newSolution, actualValue, m, n)
+                    if(newValue < actualValue):
+                        actualSolution = newSolution
+                        actualValue = newValue
+        mySolutions.append(actualSolution)
+        myValues.append(actualValue)
+        print("Found local optimum: ", actualSolution)
+        print(" with objective function value:", actualValue)
+    bestValue=np.min(myValues)[0]
+    bestOptimum=np.where(myValues=bestValue)[0]
+    return bestOptimum, bestValue
 ########################          EXECUTION          ########################
 
+m, n = chargeMatrix()
 GraphPartitioning()
 
 # m,n = chargeMatrix()

@@ -3,8 +3,8 @@ import random
 
 
 def chargeMatrix():
-    m = np.loadtxt('Examples/Adibide1.txt', skiprows=1)
-    n = int(np.loadtxt('Examples/Adibide1.txt', max_rows = 1))
+    m = np.loadtxt('Examples/Adibide10.txt', skiprows=1)
+    n = int(np.loadtxt('Examples/Adibide10.txt', max_rows = 1))
     print("Having the neighbour matrix:\n",m)
     return m, n
 
@@ -75,6 +75,7 @@ def InitialObjectiveFunctionValue(n, v, m):
     print("with the initial value:", sum)
     return sum
 
+
 def swap(actual, i, j):
     aux = actual.copy()
     aux[i] = actual[j]
@@ -101,10 +102,13 @@ def ObjectiveFunctionValue(i, j, new, actualValue, m, n):
 
 def GraphPartitioning():
     m, n = chargeMatrix()
-    graspIterations = int(n)
-    bestOptimum, bestValue = grasp(graspIterations, m, n)
+    graspIterations = 5*int(n)
+    bestOptimum, bestValue, times1 = grasp(graspIterations, m, n)
+    otherOptimum, otherValue, times2 = MultiStart(graspIterations, m, n)
     print("\n After", graspIterations, "iterations \n the best local optimum(s) was(were):", bestOptimum, 
-        "\n with objective function value: ", bestValue)
+        "\n with objective function value: ", bestValue, "\n it was found", times1, "times")
+    print("Multistart value", otherValue, otherOptimum, "\n it was found", times2, "times")
+    
 
 def grasp(iterations, m, n):
     
@@ -129,7 +133,32 @@ def grasp(iterations, m, n):
         print("with the objective function value:", actualValue)
     bestValue=np.min(myValues)
     bestOptimum=np.where(myValues==bestValue)[0]
-    return bestOptimum, bestValue
+    return mySolutions[bestOptimum[0]], bestValue, len(bestOptimum)
+
+def MultiStart(iterations, m, n):
+    
+    mySolutions=[]
+    myValues=[]
+    for x in range(iterations):
+        print("\n", x, ". iteration")
+        actualSolution = randoms(n)
+        actualValue = InitialObjectiveFunctionValue(n, actualSolution, m)
+        newSolution=[]
+        for i in range(0, n):
+            for j in range(i+1, n):
+                if (actualSolution[i] != actualSolution[j]):
+                    newSolution = swap(actualSolution, i, j)
+                    newValue = ObjectiveFunctionValue(i, j, newSolution, actualValue, m, n)
+                    if(newValue < actualValue):
+                        actualSolution = newSolution
+                        actualValue = newValue
+        mySolutions.append(actualSolution)
+        myValues.append(actualValue)
+        print("We found local optimum:", actualSolution)
+        print("with the objective function value:", actualValue)
+    bestValue=np.min(myValues)
+    bestOptimum=np.where(myValues==bestValue)[0]
+    return mySolutions[bestOptimum[0]], bestValue, len(bestOptimum)
 
 
 ########################          EXECUTION          ########################

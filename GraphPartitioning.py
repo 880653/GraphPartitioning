@@ -34,7 +34,7 @@ def randoms(size):
     positions = random.sample(range(0, size), int(size/2))
     v[positions] = 0
     
-    print("and the random initial solution:\n", v)
+    #print("and the random initial solution:\n", v)
     return v
 
 def randomGreedy(m, size):
@@ -55,7 +55,7 @@ def randomGreedy(m, size):
         if(i == size-1):
             i = 10
     v[v == -1] = 0
-    print("We have the initial random greedy solution:", v)
+    #print("We have the initial random greedy solution:", v)
     return v
 
 
@@ -122,13 +122,19 @@ def ObjectiveFunctionValue(i, j, new, actualValue, m, n):
 
 def GraphPartitioning():
     m, n = chargeNewMatrix()
+    m, n = chargeMatrix()
     graspIterations = 5*int(n)
+    graspIterations = 1
+    print("GRASP \n")
     bestOptimum, bestValue, times1 = grasp(graspIterations, m, n)
-    otherOptimum, otherValue, times2 = MultiStart(graspIterations, m, n)
-    print("\n After", graspIterations, "iterations \n the best local optimum(s) was(were):", bestOptimum, 
-        "\n with objective function value: ", bestValue, "\n it was found", times1, "times")
-    print("Multistart value", otherValue, otherOptimum, "\n it was found", times2, "times")
-    
+    print("GRASP value", bestValue, "\n it was found", times1, "times")
+    #print("GRASP value", bestValue, bestOptimum, "\n it was found", times1, "times")
+    print("MULTISTART \n")
+    initialSolutions = 5
+    otherOptimum, otherValue, times2 = MultiStart(initialSolutions, graspIterations, m, n)
+    print("Multistart value", otherValue, "\n it was found", times2, "times")
+    #print("Multistart value", otherValue, otherOptimum, "\n it was found", times2, "times")
+
 
 def grasp(iterations, m, n):
     
@@ -149,40 +155,54 @@ def grasp(iterations, m, n):
                         actualValue = newValue
         mySolutions.append(actualSolution)
         myValues.append(actualValue)
-        print("We found local optimum:", actualSolution)
+        #print("We found local optimum:", actualSolution)
         print("with the objective function value:", actualValue)
     bestValue=np.min(myValues)
     bestOptimum=np.where(myValues==bestValue)[0]
     return mySolutions[bestOptimum[0]], bestValue, len(bestOptimum)
 
-def MultiStart(iterations, m, n):
+def MultiStart(initialSolutions, iterations, m, n):
     
+    mySolutions=[]
+    myValues=[]
+    for s in range(iterations):
+        print("\n", s, "iteration")
+        for x in range(initialSolutions):
+            print("\n", x, ". solution")
+            actualSolution = randoms(n)
+            actualValue = InitialObjectiveFunctionValue(n, actualSolution, m)
+            newSolution=[]
+            for i in range(0, n):
+                for j in range(i+1, n):
+                    if (actualSolution[i] != actualSolution[j]):
+                        newSolution = swap(actualSolution, i, j)
+                        newValue = ObjectiveFunctionValue(i, j, newSolution, actualValue, m, n)
+                        if(newValue < actualValue):
+                            actualSolution = newSolution
+                            actualValue = newValue
+            mySolutions.append(actualSolution)
+            myValues.append(actualValue)
+            #print("We found local optimum:", actualSolution)
+            print("We found local optimum with the value:", actualValue)
+    bestValue=np.min(myValues)
+    bestOptimum=np.where(myValues==bestValue)[0]
+    return mySolutions[bestOptimum[0]], bestValue, len(bestOptimum)
+
+def GeneticAlgorithm(iterations, m, n):
     mySolutions=[]
     myValues=[]
     for x in range(iterations):
         print("\n", x, ". iteration")
-        actualSolution = randoms(n)
+        actualSolution = randomGreedy(m, n)
         actualValue = InitialObjectiveFunctionValue(n, actualSolution, m)
         newSolution=[]
         for i in range(0, n):
             for j in range(i+1, n):
                 if (actualSolution[i] != actualSolution[j]):
-                    newSolution = swap(actualSolution, i, j)
-                    newValue = ObjectiveFunctionValue(i, j, newSolution, actualValue, m, n)
-                    if(newValue < actualValue):
-                        actualSolution = newSolution
-                        actualValue = newValue
-        mySolutions.append(actualSolution)
-        myValues.append(actualValue)
-        print("We found local optimum:", actualSolution)
-        print("with the objective function value:", actualValue)
-    bestValue=np.min(myValues)
-    bestOptimum=np.where(myValues==bestValue)[0]
-    return mySolutions[bestOptimum[0]], bestValue, len(bestOptimum)
+                    break
 
 
 ########################          EXECUTION          ########################
 
 
 GraphPartitioning()
-

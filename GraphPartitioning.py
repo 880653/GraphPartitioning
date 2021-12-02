@@ -235,6 +235,30 @@ def crossCorrection(ind1, ind2, n):
         ind2[randomIndex] = 0
     return ind1, ind2
 
+def mutation(ind, n):
+    mutateRandom = random.random()
+    if(0.1 > mutateRandom):
+        rand = random.randint(0,n)
+        ind[rand] = random.randint(0,1)
+        print("after mutation", ind)
+        
+        ind = mutationCorrection(ind, n)
+        
+        print("after correction", ind)
+    return ind
+
+def mutationCorrection(ind, n):
+    # more 0s
+    while (np.sum(ind == 1) < (np.sum(ind == 0))):
+        zeroIndex = np.where(ind == 0)[0]
+        randomIndex = random.choice(zeroIndex)
+        ind[randomIndex] = 1
+    while (np.sum(ind == 0) < (np.sum(ind == 1))):
+        oneIndex = np.where(ind == 1)[0]
+        randomIndex = random.choice(oneIndex)
+        ind[randomIndex] = 0
+    return ind
+
 def GeneticAlgorithm(initialSolutions, iterations, m, n):
     mySolutions=[]
     myValues=[]
@@ -258,7 +282,10 @@ def GeneticAlgorithm(initialSolutions, iterations, m, n):
         r2 = randoms[1]
         new1, new2 = crossIndividuals(r1, r2, n)
         new1, new2 = crossCorrection(new1, new2, n)
+        new1 = mutation(new1, n)
+        new2 = mutation(new2, n)
         print(new1, new2)
+
 
         
         

@@ -8,6 +8,26 @@ def chargeMatrix():
     print("Having the neighbour matrix:\n",m)
     return m, n
 
+def chargeNewMatrix():
+    file = open('Examples/G250.02', "r")
+    line = file.readline()
+    splitLine = line.split(" ")
+    n = int(splitLine[0])
+    edges = int(splitLine[1])
+    m = np.zeros((n,n))
+    for i in range(edges):
+        line=file.readline()
+        line=line.replace("\n", "")
+        splitLine=line.split(" ")
+        if(splitLine[0]!=""):
+            for j in splitLine:
+                print((splitLine))
+                print(i)
+                m[i, int(j)-1]=1
+                m[int(j)-1, i]=1
+    print("Having the neighbour matrix:\n",m)
+    return m, n
+
 def randoms(size):
     # create a vector of 1s, and generate random positions where to put 0s
     v = np.ones(size, dtype=int)
@@ -101,7 +121,7 @@ def ObjectiveFunctionValue(i, j, new, actualValue, m, n):
 
 
 def GraphPartitioning():
-    m, n = chargeMatrix()
+    m, n = chargeNewMatrix()
     graspIterations = 5*int(n)
     bestOptimum, bestValue, times1 = grasp(graspIterations, m, n)
     otherOptimum, otherValue, times2 = MultiStart(graspIterations, m, n)

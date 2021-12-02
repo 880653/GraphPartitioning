@@ -211,6 +211,9 @@ def crossIndividuals(ind1, ind2, n):
     crossPoint = random.randint(0,n)
     newInd1 = np.append(ind1[:crossPoint], ind2[crossPoint:])
     newInd2 = np.append(ind2[:crossPoint], ind1[crossPoint:])
+    
+    newInd1, newInd2 = crossCorrection(ind1, ind2, n)
+    
     return newInd1, newInd2
 
 def crossCorrection(ind1, ind2, n):
@@ -280,8 +283,10 @@ def GeneticAlgorithm(initialSolutions, iterations, m, n):
         randoms = random.sample(bestSolutions, 2)
         r1 = randoms[0]
         r2 = randoms[1]
+        # cross + correct individuals
         new1, new2 = crossIndividuals(r1, r2, n)
-        new1, new2 = crossCorrection(new1, new2, n)
+        
+        # mutate + correct individuals
         new1 = mutation(new1, n)
         new2 = mutation(new2, n)
         print(new1, new2)

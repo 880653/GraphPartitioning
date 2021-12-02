@@ -125,16 +125,31 @@ def GraphPartitioning():
     m, n = chargeMatrix()
     graspIterations = 5*int(n)
     graspIterations = 1
-    print("GRASP \n")
-    bestOptimum, bestValue, times1 = grasp(graspIterations, m, n)
-    print("GRASP value", bestValue, "\n it was found", times1, "times")
-    #print("GRASP value", bestValue, bestOptimum, "\n it was found", times1, "times")
-    print("MULTISTART \n")
     initialSolutions = 5
-    otherOptimum, otherValue, times2 = MultiStart(initialSolutions, graspIterations, m, n)
-    print("Multistart value", otherValue, "\n it was found", times2, "times")
-    #print("Multistart value", otherValue, otherOptimum, "\n it was found", times2, "times")
-
+    
+    print("GRASP \n")
+    Solution1, Value1, Times1 = grasp(graspIterations, m, n)
+    print("GRASP value", Value1, "\n it was found", Times1, "times")
+    #print("GRASP value", Value1, Solution1, "\n it was found", Times1, "times")
+    
+    print("MULTISTART \n")
+    Solution2, Value2, Times2 = MultiStart(initialSolutions, graspIterations, m, n)
+    print("Multistart value", Value2, "\n it was found", Times2, "times")
+    #print("Multistart value", Value2, Solution2, "\n it was found", Times2, "times")
+    
+    print("GENETIC ALGORITHM \n")
+    Solution3, Value3, Times3 = MultiStart(initialSolutions, graspIterations, m, n)
+    print("Genetic value", Value3, "\n it was found", Times3, "times")
+    
+def Genetic():
+    m, n = chargeNewMatrix()
+    m, n = chargeMatrix()
+    graspIterations = 1
+    initialSolutions = 5
+    
+    print("GENETIC ALGORITHM \n")
+    Solution3, Value3, Times3 = MultiStart(initialSolutions, graspIterations, m, n)
+    print("Genetic value", Value3, "\n it was found", Times3, "times")
 
 def grasp(iterations, m, n):
     
@@ -188,21 +203,23 @@ def MultiStart(initialSolutions, iterations, m, n):
     bestOptimum=np.where(myValues==bestValue)[0]
     return mySolutions[bestOptimum[0]], bestValue, len(bestOptimum)
 
-def GeneticAlgorithm(iterations, m, n):
+def GeneticAlgorithm(initialSolutions, iterations, m, n):
     mySolutions=[]
     myValues=[]
-    for x in range(iterations):
-        print("\n", x, ". iteration")
-        actualSolution = randomGreedy(m, n)
-        actualValue = InitialObjectiveFunctionValue(n, actualSolution, m)
-        newSolution=[]
-        for i in range(0, n):
-            for j in range(i+1, n):
-                if (actualSolution[i] != actualSolution[j]):
-                    break
+    for s in range(initialSolutions):
+        newSolution = randomGreedy(m, n)
+        newValue = InitialObjectiveFunctionValue(n, newSolution, m)
+        mySolutions.append(newSolution)
+        myValues.append(newValue)
+    print(mySolutions, myValues)
+    bestValue=np.min(myValues)
+    bestOptimum=np.where(myValues==bestValue)[0]
+    return mySolutions[bestOptimum[0]], bestValue, len(bestOptimum)
 
 
 ########################          EXECUTION          ########################
 
 
 GraphPartitioning()
+
+Genetic()

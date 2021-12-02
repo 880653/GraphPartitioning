@@ -1,10 +1,14 @@
 import numpy as np
 import random
+from operator import itemgetter
+from heapq import nsmallest
+
+
 
 
 def chargeMatrix():
-    m = np.loadtxt('Examples/Adibide10.txt', skiprows=1)
-    n = int(np.loadtxt('Examples/Adibide10.txt', max_rows = 1))
+    m = np.loadtxt('Examples/Adibide1.txt', skiprows=1)
+    n = int(np.loadtxt('Examples/Adibide1.txt', max_rows = 1))
     print("Having the neighbour matrix:\n",m)
     return m, n
 
@@ -137,18 +141,18 @@ def GraphPartitioning():
     print("Multistart value", Value2, "\n it was found", Times2, "times")
     #print("Multistart value", Value2, Solution2, "\n it was found", Times2, "times")
     
-    print("GENETIC ALGORITHM \n")
-    Solution3, Value3, Times3 = MultiStart(initialSolutions, graspIterations, m, n)
-    print("Genetic value", Value3, "\n it was found", Times3, "times")
+    # print("GENETIC ALGORITHM \n")
+    # Solution3, Value3, Times3 = GeneticAlgorithm(initialSolutions, graspIterations, m, n)
+    # print("Genetic value", Value3, "\n it was found", Times3, "times")
     
 def Genetic():
-    m, n = chargeNewMatrix()
+    #m, n = chargeNewMatrix()
     m, n = chargeMatrix()
     graspIterations = 1
-    initialSolutions = 5
+    initialSolutions = 5*n
     
     print("GENETIC ALGORITHM \n")
-    Solution3, Value3, Times3 = MultiStart(initialSolutions, graspIterations, m, n)
+    Solution3, Value3, Times3 = GeneticAlgorithm(initialSolutions, graspIterations, m, n)
     print("Genetic value", Value3, "\n it was found", Times3, "times")
 
 def grasp(iterations, m, n):
@@ -203,23 +207,71 @@ def MultiStart(initialSolutions, iterations, m, n):
     bestOptimum=np.where(myValues==bestValue)[0]
     return mySolutions[bestOptimum[0]], bestValue, len(bestOptimum)
 
+def crossIndividuals(ind1, ind2, n):
+    crossPoint = random.randint(0,n)
+    newInd1 = np.append(ind1[:crossPoint], ind2[crossPoint:])
+    newInd2 = np.append(ind2[:crossPoint], ind1[crossPoint:])
+    return newInd1, newInd2
+
+def crossCorrection(ind1, ind2, n):
+    while (np.sum(ind1 == 1) < (np.sum(ind1 == 0))):
+        # more 0s
+        zeroIndex1 = np.where(ind1 == 0)[0]
+        randomIndex = random.choice(zeroIndex1)
+        ind1[randomIndex] = 1
+        
+        oneIndex2 = np.where(ind2 == 1)[0]
+        randomIndex = random.choice(oneIndex2)
+        ind2[randomIndex] = 0
+        
+    while (np.sum(ind1 == 0) < (np.sum(ind1 == 1))):
+        # more 1s
+        oneIndex1 = np.where(ind1 == 1)[0]
+        randomIndex = random.choice(oneIndex1)
+        ind1[randomIndex] = 0
+        
+        zeroIndex2 = np.where(ind2 == 0)[0]
+        randomIndex = random.choice(zeroIndex2)
+        ind2[randomIndex] = 0
+    return ind1, ind2
+
 def GeneticAlgorithm(initialSolutions, iterations, m, n):
     mySolutions=[]
     myValues=[]
+    
+    # generate initial values
     for s in range(initialSolutions):
         newSolution = randomGreedy(m, n)
         newValue = InitialObjectiveFunctionValue(n, newSolution, m)
         mySolutions.append(newSolution)
         myValues.append(newValue)
-    print(mySolutions, myValues)
+        
+    # sort the values
+    pairs = zip(mySolutions, myValues)
+    result = nsmallest(5, pairs, key=itemgetter(1))
+    bestValues = [i[1] for i in result]
+    bestSolutions = [i[0] for i in result]
+
+    for i in range(int(n/2)):
+        randoms = random.sample(bestSolutions, 2)
+        r1 = randoms[0]
+        r2 = randoms[1]
+        new1, new2 = crossIndividuals(r1, r2, n)
+        new1, new2 = crossCorrection(new1, new2, n)
+        print(new1, new2)
+
+        
+        
+
+    
+    
+    
     bestValue=np.min(myValues)
     bestOptimum=np.where(myValues==bestValue)[0]
     return mySolutions[bestOptimum[0]], bestValue, len(bestOptimum)
 
 
 ########################          EXECUTION          ########################
-
-
 GraphPartitioning()
 
 Genetic()

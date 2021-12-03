@@ -146,14 +146,14 @@ def GraphPartitioning():
     # print("Genetic value", Value3, "\n it was found", Times3, "times")
     
 def Genetic():
-    #m, n = chargeNewMatrix()
-    m, n = chargeMatrix()
+    m, n = chargeNewMatrix()
+    #m, n = chargeMatrix()
     graspIterations = 1
-    initialSolutions = 5*n
+    initialSolutions = 5
     
     print("GENETIC ALGORITHM \n")
-    Solution3, Value3, Times3 = GeneticAlgorithm(initialSolutions, graspIterations, m, n)
-    print("Genetic value", Value3, "\n it was found", Times3, "times")
+    Solution3, Value3, Times3, iterations = GeneticAlgorithm(initialSolutions, graspIterations, m, n)
+    print("Genetic value", Value3, "\n it was found", Times3, "times", iterations, "iterations")
 
 def grasp(iterations, m, n):
     
@@ -241,7 +241,7 @@ def crossCorrection(ind1, ind2, n):
 def mutation(ind, n):
     mutateRandom = random.random()
     if(0.1 > mutateRandom):
-        rand = random.randint(0,n)
+        rand = random.randint(0,n-1)
         ind[rand] = random.randint(0,1)
         print("after mutation", ind)
         
@@ -273,37 +273,53 @@ def GeneticAlgorithm(initialSolutions, iterations, m, n):
         mySolutions.append(newSolution)
         myValues.append(newValue)
         
-    # sort the values
-    pairs = zip(mySolutions, myValues)
-    result = nsmallest(5, pairs, key=itemgetter(1))
-    bestValues = [i[1] for i in result]
-    bestSolutions = [i[0] for i in result]
-
-    for i in range(int(n/2)):
-        randoms = random.sample(bestSolutions, 2)
-        r1 = randoms[0]
-        r2 = randoms[1]
-        # cross + correct individuals
-        new1, new2 = crossIndividuals(r1, r2, n)
+    # stopping criteria: if the minimum has been the same for the last 5 iterations, stop
+    stop = 0
+    i = 0
+    
+    while(stop < 5):
         
-        # mutate + correct individuals
-        new1 = mutation(new1, n)
-        new2 = mutation(new2, n)
-        print(new1, new2)
-
-
+        oldOptimum = np.min(myValues)
         
+        # sort the values
+        pairs = zip(mySolutions, myValues)
+        result = nsmallest(5, pairs, key=itemgetter(1))
+        myValues = [i[1] for i in result]
+        mySolutions = [i[0] for i in result]
         
-
     
     
-    
+        for i in range(int(n/2)):
+            randoms = random.sample(mySolutions, 2)
+            r1 = randoms[0]
+            r2 = randoms[1]
+            # cross + correct individuals
+            new1, new2 = crossIndividuals(r1, r2, n)
+            
+            # mutate + correct individuals
+            new1 = mutation(new1, n)
+            new2 = mutation(new2, n)
+            print(new1, new2)
+            
+            mySolutions.append(new1)
+            myValues.append(InitialObjectiveFunctionValue(n, new1, m))
+            mySolutions.append(new2)
+            myValues.append(InitialObjectiveFunctionValue(n, new2, m))
+            
+        if(np.min(myValues) == oldOptimum):
+            stop += 1
+        else:
+            stop = 0
+        i += 1
+
     bestValue=np.min(myValues)
     bestOptimum=np.where(myValues==bestValue)[0]
-    return mySolutions[bestOptimum[0]], bestValue, len(bestOptimum)
+    return mySolutions[bestOptimum[0]], bestValue, len(bestOptimum), i
 
 
 ########################          EXECUTION          ########################
 GraphPartitioning()
 
 Genetic()
+
+

@@ -2,8 +2,7 @@ import numpy as np
 import random
 from operator import itemgetter
 from heapq import nsmallest
-
-
+import timeit
 
 
 def chargeMatrix():
@@ -13,7 +12,7 @@ def chargeMatrix():
     return m, n
 
 def chargeNewMatrix():
-    file = open('Examples/G250.02', "r")
+    file = open('Examples/G124.02', "r")
     line = file.readline()
     splitLine = line.split(" ")
     n = int(splitLine[0])
@@ -126,7 +125,7 @@ def ObjectiveFunctionValue(i, j, new, actualValue, m, n):
 
 def GraphPartitioning():
     m, n = chargeNewMatrix()
-    m, n = chargeMatrix()
+    #m, n = chargeMatrix()
     graspIterations = 5*int(n)
     graspIterations = 1
     initialSolutions = 5
@@ -142,8 +141,8 @@ def GraphPartitioning():
     #print("Multistart value", Value2, Solution2, "\n it was found", Times2, "times")
     
     # print("GENETIC ALGORITHM \n")
-    # Solution3, Value3, Times3 = GeneticAlgorithm(initialSolutions, graspIterations, m, n)
-    # print("Genetic value", Value3, "\n it was found", Times3, "times")
+    # Solution3, Value3, Times3, iterations = GeneticAlgorithm(initialSolutions, graspIterations, m, n)
+    # print("Genetic value", Value3, "\n it was found", Times3, "times", iterations, "iterations")
     
 def Genetic():
     m, n = chargeNewMatrix()
@@ -240,7 +239,7 @@ def crossCorrection(ind1, ind2, n):
 
 def mutation(ind, n):
     mutateRandom = random.random()
-    if(0.1 > mutateRandom):
+    if(0.01 > mutateRandom):
         rand = random.randint(0,n-1)
         ind[rand] = random.randint(0,1)
         print("after mutation", ind)
@@ -268,7 +267,7 @@ def GeneticAlgorithm(initialSolutions, iterations, m, n):
     
     # generate initial values
     for s in range(initialSolutions):
-        newSolution = randomGreedy(m, n)
+        newSolution = randoms(n)
         newValue = InitialObjectiveFunctionValue(n, newSolution, m)
         mySolutions.append(newSolution)
         myValues.append(newValue)
@@ -288,18 +287,16 @@ def GeneticAlgorithm(initialSolutions, iterations, m, n):
         mySolutions = [i[0] for i in result]
         
     
-    
         for i in range(int(n/2)):
-            randoms = random.sample(mySolutions, 2)
-            r1 = randoms[0]
-            r2 = randoms[1]
+            rands = random.sample(mySolutions, 2)
+            r1 = rands[0]
+            r2 = rands[1]
             # cross + correct individuals
             new1, new2 = crossIndividuals(r1, r2, n)
             
             # mutate + correct individuals
             new1 = mutation(new1, n)
             new2 = mutation(new2, n)
-            print(new1, new2)
             
             mySolutions.append(new1)
             myValues.append(InitialObjectiveFunctionValue(n, new1, m))
@@ -311,15 +308,51 @@ def GeneticAlgorithm(initialSolutions, iterations, m, n):
         else:
             stop = 0
         i += 1
+        
+        print("best value", np.min(myValues))
 
     bestValue=np.min(myValues)
     bestOptimum=np.where(myValues==bestValue)[0]
     return mySolutions[bestOptimum[0]], bestValue, len(bestOptimum), i
 
 
-########################          EXECUTION          ########################
-GraphPartitioning()
+def Experiments(iter):
+    m, n = chargeNewMatrix()
+    graspIterations = iter
+    initialSolutions = 5
+    
+    # MULTISTART
+    start = timeit.default_timer()
+    print("\n MULTISTART")
+    Solution2, Value2, Times2 = MultiStart(initialSolutions, graspIterations, m, n)
+    stop = timeit.default_timer()
+    print("Multistart value", Value2, "\n it was found", Times2, "times")
+    print('Time: ', stop - start)
 
-Genetic()
+    # GRASP
+    start = timeit.default_timer()
+    print("\n GRASP")
+    Solution1, Value1, Times1 = grasp(graspIterations, m, n)
+    stop = timeit.default_timer()
+    print("GRASP value", Value1, "\n it was found", Times1, "times")
+    print('Time: ', stop - start)
+    
+
+    # GENETIC ALGORITHM    
+    start = timeit.default_timer()
+    print("\n GENETIC ALGORITHM")
+    Solution3, Value3, Times3, iterations = GeneticAlgorithm(initialSolutions, graspIterations, m, n)
+    stop = timeit.default_timer()
+    print("Genetic value", Value3, "\n it was found", Times3, "times", iterations, "iterations")
+    print('Time: ', stop - start)
+
+
+
+########################          EXECUTION          ########################
+
+
+
+iter = 10
+Experiments(iter)
 
 

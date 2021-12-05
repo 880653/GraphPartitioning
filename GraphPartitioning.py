@@ -201,16 +201,16 @@ def crossCorrection(ind1, ind2, n):
         ind2[randomIndex] = 0
     return ind1, ind2
 
-def mutation(ind, n):
-    mutateRandom = random.random()
-    if(0.01 > mutateRandom):
-        rand = random.randint(0,n-1)
-        ind[rand] = random.randint(0,1)
-        print("after mutation", ind)
-        
-        ind = mutationCorrection(ind, n)
-        
-        print("after correction", ind)
+def mutation(ind, n, mutationProb):
+    for number in range(len(ind)):
+        if(random.uniform(0,1)<mutationProb):
+            if(ind[number]==0):
+                ind[number]=1
+            else:
+                ind[number]=0
+    print("after mutation", ind) 
+    ind = mutationCorrection(ind, n) 
+    print("after correction", ind)
     return ind
 
 def mutationCorrection(ind, n):
@@ -225,12 +225,12 @@ def mutationCorrection(ind, n):
         ind[randomIndex] = 0
     return ind
 
-def GeneticAlgorithm(initialSolutions, iterations, m, n):
+def GeneticAlgorithm(initialPopulationSize, iterations, m, n, crossProb, mutationProb):
     mySolutions=[]
     myValues=[]
     
     # generate initial values
-    for s in range(initialSolutions):
+    for s in range(initialPopulationSize):
         newSolution = randoms(n)
         newValue = InitialObjectiveFunctionValue(n, newSolution, m)
         mySolutions.append(newSolution)
@@ -241,26 +241,24 @@ def GeneticAlgorithm(initialSolutions, iterations, m, n):
     i = 0
     
     while(stop < 5):
-        
         oldOptimum = np.min(myValues)
-        
         # sort the values
         pairs = zip(mySolutions, myValues)
         result = nsmallest(5, pairs, key=itemgetter(1))
         myValues = [i[1] for i in result]
         mySolutions = [i[0] for i in result]
-        
     
         for i in range(int(n/2)):
             rands = random.sample(mySolutions, 2)
-            r1 = rands[0]
-            r2 = rands[1]
-            # cross + correct individuals
-            new1, new2 = crossIndividuals(r1, r2, n)
+            new1 = rands[0]
+            new2 = rands[1]
+            # cross + correct individuals (depending on a probability)
+            if(random.uniform(0, 1)<crossProb):
+                new1, new2 = crossIndividuals(new1, new2, n)
             
-            # mutate + correct individuals
-            new1 = mutation(new1, n)
-            new2 = mutation(new2, n)
+            # mutate + correct individuals (depending on a probability)
+            new1 = mutation(new1, n, mutationProb)
+            new2 = mutation(new2, n, mutationProb)
             
             mySolutions.append(new1)
             myValues.append(InitialObjectiveFunctionValue(n, new1, m))
@@ -284,6 +282,8 @@ def GeneticAlgorithm(initialSolutions, iterations, m, n):
 def Experiments(iterations, path):
     m, n = chargeMatrix(path)
     initialSolutions=3
+    crossProb=0.2
+    mutationProb=0.2
     # MULTISTART
     start = timeit.default_timer()
     print("\n MULTISTART")
@@ -301,7 +301,7 @@ def Experiments(iterations, path):
     # GENETIC ALGORITHM    
     start = timeit.default_timer()
     print("\n GENETIC ALGORITHM")
-    gaSolution, gaBest, gaAverage, gaVariance = GeneticAlgorithm(initialSolutions, iterations, m, n)
+    gaSolution, gaBest, gaAverage, gaVariance = GeneticAlgorithm(initialSolutions, iterations, m, n, crossProb, mutationProb)
     stop = timeit.default_timer()
     print("Best: ", gaBest, " Average: ", gaAverage, " Variance: ", gaVariance, " Time: ", stop-start)
 

@@ -7,7 +7,7 @@ import timeit
 def chargeMatrix(path):
     typeOfFile=path.split(".")[len(path.split("."))-1]
     if(typeOfFile=="txt"):
-        print("charged matrix: ", path)
+        print("CHARGED MATRIX: ", path)
         m = np.loadtxt('Examples/Adibide1.txt', skiprows=1)
         n = int(np.loadtxt('Examples/Adibide1.txt', max_rows = 1))
         return m, n
@@ -90,7 +90,6 @@ def InitialObjectiveFunctionValue(n, v, m):
     for i in range (n):
         for j in range (i, n):
             sum += (v[i]*(1-v[j]) + v[j]*(1-v[i]))*m[i][j]
-    print("with the initial value:", sum)
     return sum
 
 def swap(actual, i, j):
@@ -115,12 +114,12 @@ def ObjectiveFunctionValue(i, j, new, actualValue, m, n):
                 value += m[j, index]
     return value
     
-def grasp(iterations, m, n):
-    
+def grasp(maxTime, m, n):
     mySolutions=[]
     myValues=[]
-    for x in range(iterations):
-        print("\n", x, ". iteration")
+    initialTimer=timeit.default_timer()
+    timer=0    
+    while timer<maxTime:
         actualSolution = randomGreedy(m, n)
         actualValue = InitialObjectiveFunctionValue(n, actualSolution, m)
         newSolution=[]
@@ -134,8 +133,7 @@ def grasp(iterations, m, n):
                         actualValue = newValue
         mySolutions.append(actualSolution)
         myValues.append(actualValue)
-        #print("We found local optimum:", actualSolution)
-        print("with the objective function value:", actualValue)
+        timer=timeit.default_timer()-initialTimer
     bestValue=np.min(myValues)
     bestOptimum=np.where(myValues==bestValue)[0]
     average=np.average(myValues)
@@ -143,12 +141,12 @@ def grasp(iterations, m, n):
 
     return mySolutions[bestOptimum[0]], bestValue, average, variance 
 
-def MultiStart(iterations, m, n):
-    
+def MultiStart(maxTime, m, n):
     mySolutions=[]
     myValues=[]
-    for x in range(iterations):
-        print("\n", x, ". solution")
+    initialTimer=timeit.default_timer()
+    timer=0
+    while timer<maxTime:
         actualSolution = randoms(n)
         actualValue = InitialObjectiveFunctionValue(n, actualSolution, m)
         newSolution=[]
@@ -162,8 +160,7 @@ def MultiStart(iterations, m, n):
                         actualValue = newValue
         mySolutions.append(actualSolution)
         myValues.append(actualValue)
-        #print("We found local optimum:", actualSolution)
-        print("We found local optimum with the value:", actualValue)
+        timer=timeit.default_timer()-initialTimer
     bestValue=np.min(myValues)
     bestOptimum=np.where(myValues==bestValue)[0]
     average=np.average(myValues)
@@ -208,9 +205,7 @@ def mutation(ind, n, mutationProb):
                 ind[number]=1
             else:
                 ind[number]=0
-    print("after mutation", ind) 
     ind = mutationCorrection(ind, n) 
-    print("after correction", ind)
     return ind
 
 def mutationCorrection(ind, n):
@@ -225,7 +220,7 @@ def mutationCorrection(ind, n):
         ind[randomIndex] = 0
     return ind
 
-def GeneticAlgorithm(initialPopulationSize, iterations, m, n, crossProb, mutationProb):
+def GeneticAlgorithm(initialPopulationSize, maxTime, m, n, crossProb, mutationProb):
     mySolutions=[]
     myValues=[]
     
@@ -237,10 +232,12 @@ def GeneticAlgorithm(initialPopulationSize, iterations, m, n, crossProb, mutatio
         myValues.append(newValue)
         
     # stopping criteria: if the minimum has been the same for the last 5 iterations, stop
+    # also, if the maxTime is exceeded, stop 
     stop = 0
     i = 0
-    
-    while(stop < 5):
+    initialTimer=timeit.default_timer()
+    timer=0  
+    while(stop < 5 or timer<maxTime):
         oldOptimum = np.min(myValues)
         # sort the values
         pairs = zip(mySolutions, myValues)
@@ -270,8 +267,7 @@ def GeneticAlgorithm(initialPopulationSize, iterations, m, n, crossProb, mutatio
         else:
             stop = 0
         i += 1
-        
-        print("best value", np.min(myValues))
+        timer=timeit.default_timer()-initialTimer
 
     bestValue=np.min(myValues)
     bestOptimum=np.where(myValues==bestValue)[0]
@@ -279,7 +275,7 @@ def GeneticAlgorithm(initialPopulationSize, iterations, m, n, crossProb, mutatio
     variance=np.var(myValues)
     return mySolutions[bestOptimum[0]], bestValue, average, variance
 
-def Experiments(iterations, path):
+def Experiments(maxTime, path):
     m, n = chargeMatrix(path)
     initialSolutions=3
     crossProb=0.2
@@ -287,24 +283,24 @@ def Experiments(iterations, path):
     # MULTISTART
     start = timeit.default_timer()
     print("\n MULTISTART")
-    msSolution, msBest, msAverage, msVariance = MultiStart(iterations, m, n)
+    msSolution, msBest, msAverage, msVariance = MultiStart(maxTime, m, n)
     stop = timeit.default_timer()
     print("Best: ", msBest, " Average: ", msAverage, " Variance: ", msVariance, " Time: ", stop-start)
 
     # GRASP
     start = timeit.default_timer()
     print("\n GRASP")
-    grSolution, grBest, grAverage, grVariance = grasp(iterations, m, n)
+    grSolution, grBest, grAverage, grVariance = grasp(maxTime, m, n)
     stop = timeit.default_timer()
     print("Best: ", grBest, " Average: ", grAverage, " Variance: ", grVariance, " Time: ", stop-start)
 
     # GENETIC ALGORITHM    
     start = timeit.default_timer()
     print("\n GENETIC ALGORITHM")
-    gaSolution, gaBest, gaAverage, gaVariance = GeneticAlgorithm(initialSolutions, iterations, m, n, crossProb, mutationProb)
+    gaSolution, gaBest, gaAverage, gaVariance = GeneticAlgorithm(initialSolutions, maxTime, m, n, crossProb, mutationProb)
     stop = timeit.default_timer()
     print("Best: ", gaBest, " Average: ", gaAverage, " Variance: ", gaVariance, " Time: ", stop-start)
-
+    print("------------------------")
 ########################          EXECUTION          ########################
 
 paths=['Examples/Adibide1.txt','Examples/Adibide2.txt','Examples/Adibide3.txt','Examples/Adibide4.txt',
@@ -312,6 +308,7 @@ paths=['Examples/Adibide1.txt','Examples/Adibide2.txt','Examples/Adibide3.txt','
 'Examples/Adibide9.txt','Examples/Adibide10.txt','Examples/G124.02', 'Examples/G124.16',
 'Examples/G250.02','Examples/G250.04','Examples/G250.08','Examples/G500.005','Examples/G500.02',
 'Examples/G500.04','Examples/G.sub.500','Examples/G1000.02','Examples/G1000.005','Examples/G1000.0025']
-iterations = 3
+#Indicate the maximum running time for each algorithm, in seconds
+maxTime = 1
 for path in paths:
-    Experiments(iterations, path)
+    Experiments(maxTime, path)

@@ -237,7 +237,7 @@ def GeneticAlgorithm(initialPopulationSize, maxTime, m, n, crossProb, mutationPr
     i = 0
     initialTimer=timeit.default_timer()
     timer=0  
-    while(stop < 5 or timer<maxTime):
+    while(timer<maxTime):
         oldOptimum = np.min(myValues)
         # sort the values
         pairs = zip(mySolutions, myValues)
@@ -245,7 +245,7 @@ def GeneticAlgorithm(initialPopulationSize, maxTime, m, n, crossProb, mutationPr
         myValues = [i[1] for i in result]
         mySolutions = [i[0] for i in result]
     
-        for i in range(int(n/2)):
+        for i in range(int(initialPopulationSize/2)):
             rands = random.sample(mySolutions, 2)
             new1 = rands[0]
             new2 = rands[1]
@@ -277,7 +277,7 @@ def GeneticAlgorithm(initialPopulationSize, maxTime, m, n, crossProb, mutationPr
 
 def Experiments(maxTime, path):
     m, n = chargeMatrix(path)
-    initialSolutions=3
+    initialSolutions=100
     crossProb=0.2
     mutationProb=0.2
     # MULTISTART

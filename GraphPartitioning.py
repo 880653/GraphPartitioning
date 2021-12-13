@@ -3,6 +3,7 @@ import random
 from operator import itemgetter
 from heapq import nsmallest
 import timeit
+import sys
 
 def chargeMatrix(path):
     typeOfFile=path.split(".")[len(path.split("."))-1]
@@ -280,27 +281,29 @@ def Experiments(maxTime, path):
     initialSolutions=100
     crossProb=0.2
     mutationProb=0.2
+    f = open("Results/"+path, "w")    
     # MULTISTART
+    f.write("maxTime: "+ str(maxTime)+ "; path"+ path + "\n")
     start = timeit.default_timer()
-    print("\n MULTISTART")
+    f.write("MULTISTART\n")
     msSolution, msBest, msAverage, msVariance = MultiStart(maxTime, m, n)
     stop = timeit.default_timer()
-    print("Best: ", msBest, " Average: ", msAverage, " Variance: ", msVariance, " Time: ", stop-start)
+    f.write("Best: "+ str(msBest)+ "; Average: "+ str(msAverage)+ "; Variance: "+ str(msVariance)+ "; Time: "+ str(stop-start)+"\n")
 
     # GRASP
     start = timeit.default_timer()
-    print("\n GRASP")
+    f.write("GRASP\n")
     grSolution, grBest, grAverage, grVariance = grasp(maxTime, m, n)
     stop = timeit.default_timer()
-    print("Best: ", grBest, " Average: ", grAverage, " Variance: ", grVariance, " Time: ", stop-start)
+    f.write("Best: "+ str(grBest)+ "; Average: "+ str(grAverage)+ "; Variance: "+ str(grVariance)+ "; Time: "+ str(stop-start)+"\n")
 
     # GENETIC ALGORITHM    
     start = timeit.default_timer()
-    print("\n GENETIC ALGORITHM")
+    f.write("GENETIC ALGORITHM\n")
     gaSolution, gaBest, gaAverage, gaVariance = GeneticAlgorithm(initialSolutions, maxTime, m, n, crossProb, mutationProb)
     stop = timeit.default_timer()
-    print("Best: ", gaBest, " Average: ", gaAverage, " Variance: ", gaVariance, " Time: ", stop-start)
-    print("------------------------")
+    f.write("Best: "+ str(gaBest)+ "; Average: "+ str(gaAverage)+ "; Variance: "+ str(gaVariance)+ "; Time: "+ str(stop-start)+"\n")
+    f.close()
 ########################          EXECUTION          ########################
 
 paths=['Examples/Adibide1.txt','Examples/Adibide2.txt','Examples/Adibide3.txt','Examples/Adibide4.txt',
@@ -309,6 +312,7 @@ paths=['Examples/Adibide1.txt','Examples/Adibide2.txt','Examples/Adibide3.txt','
 'Examples/G250.02','Examples/G250.04','Examples/G250.08','Examples/G500.005','Examples/G500.02',
 'Examples/G500.04','Examples/G.sub.500','Examples/G1000.02','Examples/G1000.005','Examples/G1000.0025']
 #Indicate the maximum running time for each algorithm, in seconds
-maxTime = 1
-for path in paths:
-    Experiments(maxTime, path)
+
+#Executions prepared
+print(sys.argv[1], sys.argv[2])
+Experiments(int(sys.argv[1]), sys.argv[2])

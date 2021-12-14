@@ -9,8 +9,8 @@ def chargeMatrix(path):
     typeOfFile=path.split(".")[len(path.split("."))-1]
     if(typeOfFile=="txt"):
         print("CHARGED MATRIX: ", path)
-        m = np.loadtxt('Examples/Adibide1.txt', skiprows=1)
-        n = int(np.loadtxt('Examples/Adibide1.txt', max_rows = 1))
+        m = np.loadtxt(path, skiprows=1)
+        n = int(np.loadtxt(path, max_rows = 1))
         return m, n
     else:
         return chargeNewMatrix(path)
